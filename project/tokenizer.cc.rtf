@@ -1,0 +1,115 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf0 \expnd0\expndtw0\kerning0
+#include <iostream>\
+#include <stdio.h>\
+#include <ctype.h>\
+\
+using namespace std;\
+\
+/* states in the scanner DFA */\
+typedef enum \{ \
+  START,INNUM,STCOM,INCOM,LINECOM,ENDCOM,STEQ,INID\
+\} StateType;\
+\
+void printTokens(void) \{\
+  string unit_token = "()+-*%\{\};:,";\
+  string two_char_beginning = "=><!";\
+  \
+  /* current state - always begins at START */\
+  StateType state = START;\
+  /* next character */\
+  char c;\
+\
+  do \{\
+    c = cin.get();\
+  \} while ((c == ' ') || (c == '\\t') || (c == '\\n'));\
+  if (c == EOF) printf(",");   \
+  while (c != EOF) \{\
+    switch (state) \{\
+    case START: \
+      if (isdigit(c)) \{\
+	printf("%c", c);\
+	state = INNUM;   // beginning of an integer\
+      \}\
+      else if (isalpha(c)) \{\
+	state = INID;\
+	printf("%c", c); // beginning of an identifier\
+      \}\
+      else if (unit_token.find(c) != string::npos) \
+	printf("'%c', ", c); // done with token; stay in the START state\
+      else if (two_char_beginning.find(c) != string::npos) \{\
+	printf("'%c", c);   \
+	state = STEQ;    // a possible two character token\
+      \}\
+      else if (c == '/') \
+	state = STCOM;   // a possible comment\
+      break;\
+    case STCOM:\
+      if(c == '*')\
+	state = INCOM;   // multi-line comment\
+      else if (c == '/')\
+	state = LINECOM; // line comment\
+      else \{ \
+	printf("/, ");   // the character that we didn't print\
+	cin.putback(c);\
+	state = START;	 \
+      \}\
+      break;\
+    case INCOM:\
+      if(c == '*')\
+	state = ENDCOM;  // possible end of comment\
+      break;\
+    case ENDCOM:\
+      if(c == '/')\
+	state = START;   // end of comment\
+      else\
+	state = INCOM;   // not end -- continue inside comment\
+      break;\
+    case LINECOM:\
+      if (c == '\\n')\
+	state = START;   // start over in the next line\
+      break;\
+    case STEQ:\
+      if(c != '=')\{\
+	cin.putback(c);  // previous character to be printed alone\
+	printf("', ");    \
+      \}\
+      else\
+	printf("%c', ",c); // part of the previous character\
+      state = START;\
+      break;\
+    case INNUM:\
+      if (!isdigit(c))\{   \
+	cin.putback(c);\
+	printf(", ");\
+	state = START;	  // done with number\
+      \}\
+      else\
+	printf("%c", c);  // continue to parse number\
+      break;\
+    case INID:\
+      if (!isalnum(c))\{ \
+	cin.putback(c);\
+	printf(", ");\
+	state = START;    // done with ID\
+      \}\
+      else\
+	printf("%c", c);  // continue to parse ID\
+      break;\
+    \}\
+    c = cin.get();\
+  \} \
+\} /* end printTokens */\
+\
+int main() \{\
+  printf("[");\
+  printTokens();\
+  printf("'EOF'].\\n");\
+\}}

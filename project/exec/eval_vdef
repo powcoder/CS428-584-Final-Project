@@ -1,0 +1,10 @@
+"( define eval_vdef
+  (lambda (def env)
+    ( list
+      (append
+       (list (cadr def) (eval_expr (caddr def) env))
+       (car env))
+      (cadr env)
+      )
+    )
+  )"

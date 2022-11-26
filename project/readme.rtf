@@ -1,0 +1,38 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf0 \expnd0\expndtw0\kerning0
+Compiling C++ programs at the command line:\
+\
+  g++ tokenizer.cc -o tokenizer\
+  g++ ast.cc -o ast\
+\
+To tokenize an input file (for example "small.txt"):\
+\
+  ./tokenizer < small.txt > tokens\
+\
+To parse, invoke the Prolog interpreter:\
+\
+  swipl\
+\
+Load the grammar for parsing once in the interpreter:\
+\
+  ?- [grammar].\
+  ?- parse.\
+  \
+Note that in the "parse" rule, it assumes the "tokens" file. But it\
+can be anything as long as it matches up with the output from the\
+tokenizer.\
+\
+A successful parse creates the "prolog_ast" file that contains an\
+abstract syntax tree. This file can be converted to Scheme list for\
+interpretation. To convert, use the C++ program "ast" at the command\
+line:\
+\
+   ast prolog_ast > scheme_ast\
+}
